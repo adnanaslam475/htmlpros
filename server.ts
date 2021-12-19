@@ -35,8 +35,34 @@ router.get('/projects', async function (req, res) {
 })
 
 //get projetc by id
-router.get('/project/:id', function (req, res) {
+router.get('/project/:id', async function (req, res) {
+    const { id } = req.params
+    try {
+        const data = await Project.findById({ _id: id });
+        res.send(data)
+    } catch (error) {
+        console.log('err46,', error)
+        res.send('Something wnet wrong')
+    }
+})
 
+//update projetc
+router.put('/project-update/:id', async function (req, res) {
+    const { id } = req.params
+    const parse = JSON.parse(req.body.data)
+    const updates = Object.keys(parse)
+    try {
+        const task = await Project.findById({ _id: id })
+        if (!task) {
+            return res.status(404).send()
+        }
+        updates.forEach(update => task[update] = parse[update])
+        await task.save()
+        res.send(task)
+    } catch (error) {
+        console.log('err60,', error)
+        res.send('Something wnet wrong')
+    }
 })
 const uri = 'mongodb://localhost:27017/tasks'
 const mongoOptions = {
